@@ -5,6 +5,11 @@
    border-radius: 10px;
 }
 
+p{
+    text-align: center;
+    padding-bottom: 15px;
+}
+
 body{
    font-size: 18px;
    font-family: 'Roboto Mono', monospace;
