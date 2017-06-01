@@ -1,44 +1,105 @@
-window.onload = function(){
+$(function(){
+//window.onload = function() {
 
-  var keys = document.getElementsByTagName('button');
+    // Declare all initiliation variables
+    var keys         = $('button'),
+        operators    = ['/', '*', '-', '+', '%'],
+        lastOperator = '',
+        decimalAdded = false;
 
-  for (var i = 0; i < keys.length; i++){
+      keys.each(function(i){
 
-    keys[i].onclick = function(){
 
-      var operator  = ['/','*','-','+','%']
-      var keyValue  = this.innerHTML;
-        detail      = document.getElementById('detail'),
-        detailValue = detail.innerHTML
-        resault     = document.getElementById('result-value');
+        // Add click event listener to all key
+        $(this).click(function(){
 
-      switch (keyValue) {
-        case 'C':
-          detail.innerHTML = '';
-          resault.innerHTML = '0';
-          break;
-        case ':':
-        case '*':
-        case '-':
-        case '+':
-        case '%':
-          var lastChar = detail.innerHTML[detail.innerHTML.length - 1];
 
-          if (operators.indexOf(lastChar)) {
+            // Add initial variables
+            var keyValue    = $(this).html(),
+                detail      = $('#detail'),
+                detailValue = detail.html(),
+                lastChar    = detailValue[detailValue.length - 1],
+                result      = $('#result-value');
 
-          }
+            // Use switch case for different function of keys
+            switch (keyValue) {
+                // Case for clearing the calculator
+                case 'C':
+                    result.html('0');
+                    detail.html('');
+                    break;
+                // Show the result for calculation
+                case '=':
+                    if (detail.html() != '') {
+                        result.html(eval(detailValue));
+                        decimalAdded = false;
+                    }
+                    break;
+                // Case for arithmatic operator
+                case '/':
+                case '*':
+                case '-':
+                case '+':
+                case '%':
+                if (detailValue != '' && $.inArray(lastChar, operators) == -1) {
+                        detail.html(detailValue + keyValue);
+                    } else {
+                        detail.html(detail.html().replace(/.$/, keyValue));
+                    }
 
-          detail.innerHTML += this.innerHTML;
-          break;
-        case '=':
-          resault.innerHTML = eval(detail.innerHTML);
-          break;
-        default:
-          detail.innerHTML += this.innerHTML;
-          break;
-      }
+                    decimalAdded = false;
+                    lastOperator = keyValue;
+                    break;
+                // Case for delete char
+                case 'del':
+                    if (lastChar == '.') {
+                        decimalAdded = false;
+                    }
 
-    }
-  }
+                    detail.html(detail.html().replace(/.$/, ''));
+                    break;
+                // Case for add period
+                case '.':
+                    if ( ! decimalAdded) {
+                          detail.html(detailValue + keyValue);
+                        decimalAdded = true;
+                    }
+                    break;
+                // Case for signing minus/plus to the last calculation
+                case '+/-':
+                    if (detailValue != '' && operators.indexOf(lastChar) == -1) {
+                        if (lastOperator == '') {
+                            if (detailValue == Math.abs(detailValue)) {
+                                detail.html(detailValue+keyValue);
+                            } else {
+                                detail.html(Math.abs(eval(detailValue)));
+                            }
+                        } else {
+                            var array     = detail.html().split(lastOperator),
+                                lastIndex = array.length - 1,
+                                newDetail = '',
+                                oldDetail = '';
 
-}
+                            if (array[lastIndex] == Math.abs(array[lastIndex])) {
+                                newDetail = '(' + -(array[lastIndex]) + ')';
+                            } else {
+                                newDetail = Math.abs(eval(array[lastIndex]));
+                            }
+
+                            for (var i = 0; i < lastIndex; i++) {
+                                oldDetail += array[i] + lastOperator;
+                            }
+
+                            detail.html(oldDetail+newDetail);
+                        }
+                    }
+                    break;
+                // Beside of that, just displaying the key value to the calculation
+                // This is used for number
+                default:
+                    detail.html(detailValue+keyValue);
+                    break;
+            }
+        });
+    });
+});
